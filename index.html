@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Registre o trabalho, os programas e a configuração do computador que sua equipe precisa."
+    />
+    <title>Levantamento de computador | Planejamento de compras</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="Início">
+        <span class="brand-mark" aria-hidden="true">✓</span>
+        <span>Levantamento<span class="brand-light"> de necessidades</span></span>
+      </a>
+      <div class="topbar-note" id="save-status" aria-live="polite">
+        <span class="status-dot"></span> Rascunho local neste navegador
+      </div>
+    </header>
+
+    <main class="page-shell">
+      <section class="intro">
+        <div class="eyebrow"><span class="eyebrow-line"></span> PLANEJAMENTO DE COMPRAS</div>
+        <h1>Estruture a necessidade antes<br class="desktop-break" /> de definir o equipamento.</h1>
+        <p>Organize como o computador será usado, quais programas apoiam o trabalho e quais requisitos já estão definidos.</p>
+      </section>
+
+      <div class="workspace">
+        <aside class="step-rail" aria-label="Etapas do levantamento">
+          <div class="rail-heading">SEU LEVANTAMENTO</div>
+          <ol class="step-list">
+            <li class="step-item is-active" data-step-indicator="1">
+              <span class="step-number">01</span>
+              <span class="step-copy"><strong>O trabalho</strong><small>Necessidades da equipe</small></span>
+              <span class="step-check" aria-hidden="true">✓</span>
+            </li>
+            <li class="step-item" data-step-indicator="2">
+              <span class="step-number">02</span>
+              <span class="step-copy"><strong>Programas</strong><small>Ferramentas e atividades</small></span>
+              <span class="step-check" aria-hidden="true">✓</span>
+            </li>
+            <li class="step-item" data-step-indicator="3">
+              <span class="step-number">03</span>
+              <span class="step-copy"><strong>Configuração</strong><small>Computador proposto</small></span>
+              <span class="step-check" aria-hidden="true">✓</span>
+            </li>
+          </ol>
+          <div class="rail-tip">
+            <span class="tip-icon" aria-hidden="true">i</span>
+            <p>Não tem todos os detalhes agora? Você pode deixar a configuração em aberto e completar depois.</p>
+          </div>
+        </aside>
+
+        <section class="form-card" aria-live="polite">
+          <div class="form-card-top">
+            <span class="step-kicker" id="step-kicker">ETAPA 01 DE 03</span>
+            <span class="time-note"><span aria-hidden="true">◷</span> Cerca de 3 minutos</span>
+          </div>
+
+          <form id="intake-form" novalidate>
+            <section class="form-step is-visible" data-step="1">
+              <div class="section-title">
+                <span class="section-icon" aria-hidden="true">↗</span>
+                <div>
+                  <h2>O que precisa ser feito?</h2>
+                  <p>Comece pelo trabalho, não pelo equipamento.</p>
+                </div>
+              </div>
+
+              <label class="field-label" for="work-title">Nome do setor, equipe ou atividade <span class="required">*</span></label>
+              <input id="work-title" name="workTitle" type="text" placeholder="Ex.: Equipe de projetos de engenharia" required />
+              <p class="field-hint">Uma identificação simples ajuda a contextualizar este levantamento.</p>
+
+              <label class="field-label spaced-label" for="work-description">Descreva o trabalho realizado <span class="required">*</span></label>
+              <textarea
+                id="work-description"
+                name="workDescription"
+                rows="4"
+                placeholder="Quais tarefas serão feitas no computador? Há arquivos grandes, muitas janelas abertas, reuniões ou atividades que exigem mais desempenho?"
+                required
+              ></textarea>
+              <p class="field-hint">Descreva as atividades do dia a dia e o que é importante para realizá-las bem.</p>
+
+              <div class="field-grid">
+                <div>
+                  <label class="field-label" for="people-count">Quantas pessoas usarão o equipamento?</label>
+                  <div class="input-with-suffix">
+                    <input id="people-count" name="peopleCount" type="number" min="1" placeholder="Ex.: 5" />
+                    <span>pessoas</span>
+                  </div>
+                </div>
+                <div>
+                  <label class="field-label" for="work-location">Onde será usado?</label>
+                  <select id="work-location" name="workLocation">
+                    <option value="">Selecione uma opção</option>
+                    <option>Escritório</option>
+                    <option>Trabalho remoto</option>
+                    <option>Ambientes variados</option>
+                    <option>Outro</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="field-grid context-grid">
+                <div>
+                  <label class="field-label" for="use-frequency">Com que frequência será usado?</label>
+                  <select id="use-frequency" name="useFrequency">
+                    <option value="">Selecione uma opção</option>
+                    <option>Durante boa parte do dia</option>
+                    <option>Por algumas horas ao dia</option>
+                    <option>Ocasionalmente</option>
+                    <option>Ainda não definido</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="field-label" for="work-impact">Qual o impacto se ficar indisponível?</label>
+                  <select id="work-impact" name="workImpact">
+                    <option value="">Selecione uma opção</option>
+                    <option>Interrompe uma atividade essencial</option>
+                    <option>Atrasa, mas há alternativa</option>
+                    <option>Baixo; uso não urgente</option>
+                    <option>Ainda não definido</option>
+                  </select>
+                </div>
+              </div>
+
+              <label class="field-label spaced-label" for="workload-details">Tarefas simultâneas e arquivos</label>
+              <textarea
+                id="workload-details"
+                name="workloadDetails"
+                rows="3"
+                placeholder="Ex.: videoconferência junto com planilhas grandes; arquivos de vídeo, projetos 3D ou bases de dados."
+              ></textarea>
+              <p class="field-hint">Se souber, descreva o tamanho dos arquivos ou quantos programas costumam ficar abertos ao mesmo tempo.</p>
+              <p class="error-message" data-error="1" role="alert"></p>
+            </section>
+
+            <section class="form-step" data-step="2" hidden>
+              <div class="section-title">
+                <span class="section-icon" aria-hidden="true">⌘</span>
+                <div>
+                  <h2>Quais programas serão usados?</h2>
+                  <p>Adicione cada ferramenta e descreva as tarefas realizadas nela.</p>
+                </div>
+              </div>
+
+              <div class="software-list" id="software-list"></div>
+              <button class="add-software" id="add-software" type="button">
+                <span aria-hidden="true">＋</span> Adicionar outro programa
+              </button>
+              <div class="usage-note"><span aria-hidden="true">✳</span> Versão e recursos específicos são opcionais. Informe apenas o que souber; não precisa pesquisar agora.</div>
+              <p class="error-message" data-error="2" role="alert"></p>
+            </section>
+
+            <section class="form-step" data-step="3" hidden>
+              <div class="section-title">
+                <span class="section-icon" aria-hidden="true">▤</span>
+                <div>
+                  <h2>Já existe uma configuração proposta?</h2>
+                  <p>Registre a proposta existente ou indique o que ainda não foi definido.</p>
+                </div>
+              </div>
+
+              <label class="field-label" for="processor">Processador</label>
+              <input id="processor" name="processor" type="text" placeholder="Ex.: Intel Core i5 ou AMD Ryzen 5" />
+              <p class="field-hint">Se souber, informe o modelo completo. Se ainda não foi escolhido, deixe em branco.</p>
+
+              <div class="field-grid config-grid">
+                <div>
+                  <label class="field-label" for="memory">Memória RAM</label>
+                  <div class="input-with-suffix">
+                    <input id="memory" name="memory" type="number" min="1" placeholder="Ainda não definido" />
+                    <span>GB</span>
+                  </div>
+                </div>
+                <div>
+                  <label class="field-label" for="storage">Armazenamento</label>
+                  <input id="storage" name="storage" type="text" placeholder="Ex.: SSD 512 GB ou não definido" />
+                </div>
+              </div>
+
+              <label class="field-label spaced-label" for="graphics">Placa de vídeo</label>
+              <input id="graphics" name="graphics" type="text" placeholder="Ex.: integrada ou NVIDIA GeForce RTX 4060" />
+              <p class="field-hint">Pode informar o modelo ou deixar em branco se ainda não estiver definido.</p>
+
+              <label class="field-label spaced-label" for="support-requirements">Garantia e assistência técnica</label>
+              <textarea
+                id="support-requirements"
+                name="supportRequirements"
+                rows="3"
+                placeholder="Ex.: prazo de garantia, cobertura, atendimento no local ou tempo esperado para reparo — se já houver uma necessidade identificada."
+              ></textarea>
+
+              <label class="field-label spaced-label" for="other-requirements">Compatibilidade, mobilidade e outros requisitos</label>
+              <textarea
+                id="other-requirements"
+                name="otherRequirements"
+                rows="3"
+                placeholder="Ex.: precisa ser transportado entre unidades, conectar a equipamentos existentes ou funcionar com sistemas específicos."
+              ></textarea>
+              <p class="field-hint">Descreva necessidades conhecidas; não é necessário especificar marcas ou modelos.</p>
+
+              <div class="config-note">
+                <span class="note-icon" aria-hidden="true">↳</span>
+                <p>Este levantamento organiza as informações fornecidas. Ele não valida requisitos, recomenda configurações nem garante conformidade para uma contratação.</p>
+              </div>
+              <p class="error-message" data-error="3" role="alert"></p>
+            </section>
+
+            <section class="form-step summary-step" data-step="4" hidden>
+              <div class="section-title">
+                <span class="section-icon success-icon" aria-hidden="true">✓</span>
+                <div>
+                  <h2>Levantamento registrado</h2>
+                  <p>Confira as informações. Você pode voltar e editar qualquer etapa.</p>
+                </div>
+              </div>
+              <p class="save-note">O rascunho é salvo apenas neste navegador e não é enviado a um servidor. Evite inserir dados pessoais ou informações sigilosas.</p>
+              <div class="summary-content" id="summary-content"></div>
+              <div class="summary-disclaimer">Este resumo reúne somente os dados informados. Não compara componentes, recomenda equipamentos, verifica conformidade legal ou substitui a análise da equipe responsável.</div>
+              <div class="summary-actions">
+                <button class="download-button" id="download-button" type="button">Baixar resumo (.txt)</button>
+                <button class="clear-button" id="clear-button" type="button">Apagar rascunho</button>
+              </div>
+            </section>
+
+            <div class="form-footer">
+              <button class="back-button" id="back-button" type="button" hidden>← Voltar</button>
+              <span class="footer-spacer"></span>
+              <button class="next-button" id="next-button" type="button">Continuar <span aria-hidden="true">→</span></button>
+              <button class="edit-button" id="edit-button" type="button" hidden>Editar levantamento</button>
+            </div>
+          </form>
+        </section>
+      </div>
+      <footer class="page-footer"><span>PLANEJAMENTO DE COMPRAS</span><span>MVP em validação com equipes de órgãos públicos</span></footer>
+    </main>
+  </body>
+</html>
