@@ -20,6 +20,21 @@ const fieldNames = [
 const saveKey = "base-tecnica-computer-intake";
 const referencesKey = "computer-intake-custom-references";
 const referenceSources = window.DOCUMENTED_REFERENCES || [];
+const PROGRAM_PRESETS = [
+  { id: "excel", name: "Excel", usage: "Criar, consultar e editar planilhas.", features: "Preencher conforme o tamanho dos arquivos, fórmulas, macros e volume de dados." },
+  { id: "word", name: "Word", usage: "Criar e editar documentos de texto." },
+  { id: "powerpoint", name: "PowerPoint", usage: "Criar e apresentar apresentações." },
+  { id: "outlook", name: "Outlook", usage: "E-mail, agenda e comunicação." },
+  { id: "teams", name: "Microsoft Teams", usage: "Reuniões, chamadas e colaboração." },
+  { id: "browser", name: "Navegador web", usage: "Acessar sistemas e serviços web." },
+  { id: "autocad", name: "AutoCAD", usage: "Desenho técnico e modelagem.", version: "Informar versão", features: "Indicar uso 2D/3D, tamanho dos projetos e renderização." },
+  { id: "photoshop", name: "Adobe Photoshop", usage: "Edição e composição de imagens.", version: "Informar versão", features: "Indicar resolução e quantidade de imagens em edição." },
+  { id: "illustrator", name: "Adobe Illustrator", usage: "Criação e edição de ilustrações vetoriais.", version: "Informar versão" },
+  { id: "premiere", name: "Adobe Premiere Pro", usage: "Edição de vídeo.", version: "Informar versão", features: "Indicar resolução, codecs e complexidade dos projetos." },
+  { id: "sketchup", name: "SketchUp", usage: "Modelagem 3D.", version: "Informar versão" },
+  { id: "vscode", name: "Visual Studio Code", usage: "Edição de código e desenvolvimento.", version: "Informar versão" },
+  { id: "other", name: "Outro programa", usage: "", version: "", features: "" },
+];
 let currentStep = 1;
 let softwareCount = 0;
 let customReferences = [];
@@ -50,6 +65,29 @@ function addSoftware(program = {}) {
       <button class="remove-software" type="button" aria-label="Remover programa">Remover</button>
     </div>
     <div class="software-fields">
+      <div class="software-preset-field">
+        <label for="software-preset-${softwareCount}">Escolha um programa comum ou preencha manualmente</label>
+        <select id="software-preset-${softwareCount}" name="softwarePreset">
+          <option value="">Selecionar programa (opcional)</option>
+          <optgroup label="Escritório e comunicação">
+            <option value="excel">Microsoft Excel</option>
+            <option value="word">Microsoft Word</option>
+            <option value="powerpoint">Microsoft PowerPoint</option>
+            <option value="outlook">Microsoft Outlook</option>
+            <option value="teams">Microsoft Teams</option>
+            <option value="browser">Navegador web</option>
+          </optgroup>
+          <optgroup label="Criação, engenharia e desenvolvimento">
+            <option value="autocad">AutoCAD</option>
+            <option value="photoshop">Adobe Photoshop</option>
+            <option value="illustrator">Adobe Illustrator</option>
+            <option value="premiere">Adobe Premiere Pro</option>
+            <option value="sketchup">SketchUp</option>
+            <option value="vscode">Visual Studio Code</option>
+          </optgroup>
+          <option value="other">Outro programa</option>
+        </select>
+      </div>
       <div><label for="software-name-${softwareCount}">Nome do programa <span class="required">*</span></label><input id="software-name-${softwareCount}" name="softwareName" type="text" placeholder="Ex.: Microsoft 365" required /></div>
       <div><label for="software-version-${softwareCount}">Versão (se souber)</label><input id="software-version-${softwareCount}" name="softwareVersion" type="text" placeholder="Ex.: Microsoft 365 Apps" /></div>
       <div><label for="software-usage-${softwareCount}">Como será usado? <span class="required">*</span></label><input id="software-usage-${softwareCount}" name="softwareUsage" type="text" placeholder="Ex.: elaborar documentos e planilhas" required /></div>
@@ -59,6 +97,18 @@ function addSoftware(program = {}) {
   card.querySelector('[name="softwareVersion"]').value = program.version || "";
   card.querySelector('[name="softwareUsage"]').value = program.usage || "";
   card.querySelector('[name="softwareFeatures"]').value = program.features || "";
+  card.querySelector('[name="softwarePreset"]').addEventListener("change", (event) => {
+    const preset = PROGRAM_PRESETS.find((item) => item.id === event.target.value);
+    if (!preset || preset.id === "other") {
+      if (preset) card.querySelector('[name="softwareName"]').focus();
+      return;
+    }
+    card.querySelector('[name="softwareName"]').value = preset.name;
+    card.querySelector('[name="softwareUsage"]').value = preset.usage;
+    card.querySelector('[name="softwareVersion"]').value = preset.version || "";
+    card.querySelector('[name="softwareFeatures"]').value = preset.features || "";
+    saveDraft();
+  });
   card.querySelector(".remove-software").addEventListener("click", () => {
     if (softwareList.children.length === 1) {
       showError(2, "Adicione pelo menos um programa para continuar.");
@@ -243,14 +293,24 @@ function withoutTrailingPunctuation(value) {
 
 function findReference(program) {
   const name = normalizedName(`${program.name} ${program.version}`);
-  const programName = normalizedName(program.name);
-  const custom = customReferences.find((reference) => {
+  const searchText = ` ${name} `;
+  const matchingCustomReferences = customReferences.filter((reference) => {
     const registered = normalizedName(reference.program);
-    const paddedName = ` ${programName} `;
-    return programName === registered || programName.startsWith(`${registered} `)
-      || paddedName.includes(` ${registered} `) || registered.startsWith(`${programName} `);
+    return registered && searchText.includes(` ${registered} `);
   });
+  const custom = matchingCustomReferences.sort((left, right) => right.program.length - left.program.length)[0];
   if (custom) return custom;
+  const office2024 = referenceSources.find((reference) => reference.id === "office-ltsc-2024");
+  if (office2024 && /\b(?:excel|word|powerpoint|outlook)\b/.test(name) && /\b(?:2024|ltsc 2024)\b/.test(name)) {
+    return office2024;
+  }
+  const office2021 = referenceSources.find((reference) => reference.id === "office-ltsc-2021");
+  if (office2021 && /\b(?:excel|word|powerpoint|outlook)\b/.test(name) && /\b(?:2021|ltsc 2021)\b/.test(name)) {
+    return office2021;
+  }
+  if (/\b(?:excel|word|powerpoint|outlook)\b/.test(name) && /\b(?:2019|2016|2013|2010)\b/.test(name)) {
+    return null;
+  }
   const orderedSources = [...referenceSources].sort((left, right) => {
     const leftLength = Math.max(...left.aliases.map((alias) => alias.length));
     const rightLength = Math.max(...right.aliases.map((alias) => alias.length));
@@ -276,6 +336,14 @@ function readCpu() {
   };
 }
 
+function parseCapacityGb(value) {
+  const match = value.match(/(\d+(?:[.,]\d+)?)\s*(tb|gb|mb)\b/i);
+  if (!match) return null;
+  const amount = Number(match[1].replace(",", "."));
+  const unit = match[2].toLowerCase();
+  return unit === "tb" ? amount * 1000 : unit === "mb" ? amount / 1000 : amount;
+}
+
 function statusForNumeric(actual, minimum, unit, requirementName) {
   if (minimum === undefined || minimum === null || minimum === "") {
     return { status: "unknown", label: "Sem dados suficientes", note: `A fonte cadastrada não informa um mínimo comparável para ${requirementName}.` };
@@ -290,6 +358,30 @@ function statusForNumeric(actual, minimum, unit, requirementName) {
     return { status: "above", label: "Acima da referência", note: `O valor informado (${actual} ${unit}) supera o mínimo documentado (${minimum} ${unit}); isso não demonstra desperdício nem substitui a justificativa do dimensionamento.` };
   }
   return { status: "adequate", label: "Adequado", note: `O valor informado corresponde ao mínimo documentado (${minimum} ${unit}); avalie a carga real e a margem necessária.` };
+}
+
+function compareStorage(reference) {
+  const requirements = reference.requirements || {};
+  const kind = requirements.storageKind || "freeSpace";
+  const minimum = requirements.storageGb;
+  const capacity = readFormValue("storage");
+  const freeSpace = readFormValue("freeStorageGb");
+  const actual = kind === "capacity"
+    ? parseCapacityGb(capacity)
+    : freeSpace ? Number(freeSpace) : null;
+  if ((actual === null || !Number.isFinite(actual)) && kind === "freeSpace" && capacity) {
+    return {
+      status: "unknown",
+      label: "Sem dados suficientes",
+      note: `Você informou a capacidade total (“${capacity}”), mas a referência exige ${minimum} GB de espaço livre. Informe o espaço livre previsto; não é possível inferi-lo pela capacidade do SSD.`,
+    };
+  }
+  return statusForNumeric(
+    actual,
+    minimum,
+    "GB",
+    kind === "capacity" ? "capacidade total do disco" : "espaço livre em disco",
+  );
 }
 
 function compareCpu(reference) {
@@ -375,12 +467,7 @@ function compareComponent(reference, component) {
     "GB",
     "memória RAM",
   );
-  if (component === "Armazenamento") return statusForNumeric(
-    readFormValue("freeStorageGb") ? Number(readFormValue("freeStorageGb")) : null,
-    requirements.storageGb,
-    "GB",
-    "espaço livre em disco",
-  );
+  if (component === "Armazenamento") return compareStorage(reference);
   if (component === "Sistema operacional") return compareOperatingSystem(reference);
   if (component === "Resolução de tela") return compareDisplay(reference);
   if (component === "Placa de vídeo") return compareGraphics(reference);
@@ -450,6 +537,7 @@ function assessProgram(program, reference) {
         setSaveStatus("Não foi possível remover a referência local", true);
         return;
       }
+      updateMinimumReferenceOptions();
       renderComparison();
       saveDraft();
     });
@@ -470,7 +558,11 @@ function assessProgram(program, reference) {
     if (component === "Processador" && (requirements.cpuGhz || requirements.cpuCores)) {
       requirement = [requirements.cpuGhz && `${requirements.cpuGhz} GHz`, requirements.cpuCores && `${requirements.cpuCores} núcleos`].filter(Boolean).join(" e ");
     } else if (component === "Memória RAM" && requirements.memoryGb) requirement = `${requirements.memoryGb} GB mínimos`;
-    else if (component === "Armazenamento" && requirements.storageGb) requirement = `${requirements.storageGb} GB de espaço disponível`;
+    else if (component === "Armazenamento" && requirements.storageGb) {
+      requirement = requirements.storageKind === "capacity"
+        ? `${requirements.storageGb} GB de capacidade total`
+        : `${requirements.storageGb} GB de espaço livre disponível`;
+    }
     else if (component === "Sistema operacional") requirement = requirements.operatingSystem || requirement;
     else if (component === "Resolução de tela" && requirements.displayWidth && requirements.displayHeight) requirement = `${requirements.displayWidth} × ${requirements.displayHeight} pixels`;
     else if (component === "Placa de vídeo") requirement = requirements.graphicsText || (requirements.graphicsDirectX ? `DirectX ${requirements.graphicsDirectX} ou posterior` : requirement);
@@ -501,6 +593,79 @@ function renderComparison() {
   });
 }
 
+function updateMinimumReferenceOptions() {
+  const select = document.querySelector("#minimum-reference");
+  const currentValue = select.value;
+  select.replaceChildren(new Option("Selecione uma referência de programa", ""));
+  const references = [
+    ...referenceSources.map((reference) => ({
+      value: `builtin:${reference.id}`,
+      label: reference.name,
+    })),
+    ...customReferences.map((reference) => ({
+      value: `custom:${reference.id}`,
+      label: `${reference.program} — referência cadastrada`,
+    })),
+  ];
+  references.forEach((reference) => select.add(new Option(reference.label, reference.value)));
+  if (references.some((reference) => reference.value === currentValue)) select.value = currentValue;
+}
+
+function fillFromMinimumReference() {
+  const selected = document.querySelector("#minimum-reference").value;
+  const status = document.querySelector("#reference-fill-status");
+  const [kind, id] = selected.split(":");
+  const reference = kind === "custom"
+    ? customReferences.find((item) => item.id === id)
+    : referenceSources.find((item) => item.id === id);
+  if (!reference) {
+    status.textContent = "Selecione uma referência disponível.";
+    return;
+  }
+  const requirements = reference.requirements || {};
+  const filled = [];
+  if (requirements.cpuGhz || requirements.cpuCores) {
+    const parts = [
+      requirements.cpuGhz && `${requirements.cpuGhz} GHz`,
+      requirements.cpuCores && `${requirements.cpuCores} núcleos`,
+    ].filter(Boolean);
+    form.elements.processor.value = parts.join(", ");
+    filled.push("processador (mínimo publicado)");
+  }
+  if (requirements.memoryGb) {
+    form.elements.memory.value = requirements.memoryGb;
+    filled.push("RAM");
+  }
+  if (requirements.storageGb) {
+    if (requirements.storageKind === "capacity") {
+      form.elements.storage.value = `${requirements.storageGb} GB`;
+      filled.push("capacidade total de armazenamento");
+    } else {
+      form.elements.freeStorageGb.value = requirements.storageGb;
+      filled.push("espaço livre mínimo");
+    }
+  }
+  if (requirements.operatingSystem) {
+    form.elements.operatingSystem.value = requirements.operatingSystem;
+    filled.push("sistema operacional");
+  }
+  if (requirements.displayWidth && requirements.displayHeight) {
+    form.elements.displayResolution.value = `${requirements.displayWidth} x ${requirements.displayHeight}`;
+    filled.push("resolução de tela");
+  }
+  if (requirements.graphicsDirectX) {
+    form.elements.graphics.value = `Compatibilidade DirectX ${requirements.graphicsDirectX} (confirmar GPU e driver)`;
+    filled.push("compatibilidade gráfica");
+  } else if (requirements.graphicsText) {
+    form.elements.graphics.value = requirements.graphicsText;
+    filled.push("requisito gráfico (texto para conferência)");
+  }
+  status.textContent = filled.length
+    ? `Preenchidos: ${filled.join(", ")}. Confirme se a versão do programa e o escopo da referência correspondem ao seu caso; os valores continuam editáveis.`
+    : "A referência selecionada não contém valores de componentes que possam ser preenchidos.";
+  saveDraft();
+}
+
 function addReferenceFromForm() {
   const program = readFormValue("referenceProgram");
   const sourceTitle = readFormValue("referenceTitle");
@@ -524,6 +689,7 @@ function addReferenceFromForm() {
   const graphicsText = readFormValue("referenceGraphics");
   const operatingSystem = readFormValue("referenceOs");
   const displayMatch = readFormValue("referenceDisplay").match(/(\d{3,5})\s*[x×]\s*(\d{3,5})/i);
+  const storageKind = readFormValue("referenceStorageKind") || "freeSpace";
   const invalidNumeric = Object.entries(numericValues).some(([, value]) => value && (!Number.isFinite(Number(value)) || Number(value) <= 0));
   const hasNumericRequirement = Object.values(numericValues).some((value) => value && Number(value) > 0);
   if (invalidNumeric) {
@@ -542,6 +708,7 @@ function addReferenceFromForm() {
   Object.entries(numericValues).forEach(([key, value]) => {
     if (value) requirements[key] = Number(value);
   });
+  if (numericValues.storageGb) requirements.storageKind = storageKind;
   if (graphicsText) requirements.graphicsText = graphicsText;
   if (operatingSystem) requirements.operatingSystem = operatingSystem;
   if (displayMatch) {
@@ -568,8 +735,9 @@ function addReferenceFromForm() {
     customReferences = loadCustomReferences();
     return;
   }
-  ["referenceProgram", "referenceTitle", "referenceUrl", "referenceCpu", "referenceCores", "referenceMemory", "referenceStorage", "referenceDirectx", "referenceGraphics", "referenceOs", "referenceDisplay"]
+  ["referenceProgram", "referenceTitle", "referenceUrl", "referenceCpu", "referenceCores", "referenceMemory", "referenceStorage", "referenceStorageKind", "referenceDirectx", "referenceGraphics", "referenceOs", "referenceDisplay"]
     .forEach((name) => { form.elements.namedItem(name).value = ""; });
+  updateMinimumReferenceOptions();
   renderComparison();
   saveDraft();
 }
@@ -741,6 +909,7 @@ addSoftwareButton.addEventListener("click", () => {
   saveDraft();
 });
 document.querySelector("#add-reference").addEventListener("click", addReferenceFromForm);
+document.querySelector("#fill-reference").addEventListener("click", fillFromMinimumReference);
 document.querySelector("#regenerate-etp").addEventListener("click", () => {
   etpEditor.value = generateEtpDraft();
   showError(5);
@@ -776,4 +945,5 @@ form.addEventListener("change", (event) => {
 });
 
 customReferences = loadCustomReferences();
+updateMinimumReferenceOptions();
 updateHomeActions();

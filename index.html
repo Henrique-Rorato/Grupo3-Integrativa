@@ -106,6 +106,15 @@
 
               <section class="form-step" data-step="3" hidden>
                 <div class="section-title"><span class="section-icon" aria-hidden="true">▤</span><div><h2>Qual configuração está sendo proposta?</h2><p>Informe o que já existe. Campos em branco serão apontados como lacunas.</p></div></div>
+                <div class="starter-reference">
+                  <label class="field-label" for="minimum-reference">Referência inicial de componentes (opcional)</label>
+                  <div class="field-grid">
+                    <div><select id="minimum-reference" aria-describedby="minimum-reference-hint"><option value="">Selecione uma referência de programa</option></select></div>
+                    <div><button class="secondary-button" id="fill-reference" type="button">Preencher mínimos documentados</button></div>
+                  </div>
+                  <p class="field-hint" id="minimum-reference-hint">Preenche apenas os campos cobertos pela referência escolhida. São mínimos de software, não uma recomendação de computador; você pode editar todos os valores.</p>
+                  <p class="reference-fill-status" id="reference-fill-status" role="status" aria-live="polite"></p>
+                </div>
                 <label class="field-label" for="processor">Processador</label>
                 <input id="processor" name="processor" type="text" placeholder="Para comparar: modelo, GHz e número de núcleos quando documentados" />
                 <p class="field-hint">O nome comercial sozinho não informa desempenho comparável. Não inferimos desempenho por marca ou família.</p>
@@ -149,7 +158,8 @@
                     <div><label class="field-label" for="reference-cpu">CPU mínima (GHz), se publicada</label><input id="reference-cpu" name="referenceCpu" type="number" min="0.1" step="0.1" /></div>
                     <div><label class="field-label" for="reference-cores">Núcleos mínimos, se publicados</label><input id="reference-cores" name="referenceCores" type="number" min="1" step="1" /></div>
                     <div><label class="field-label" for="reference-memory">RAM mínima (GB), se publicada</label><input id="reference-memory" name="referenceMemory" type="number" min="1" step="1" /></div>
-                    <div><label class="field-label" for="reference-storage">Espaço livre mínimo em disco (GB)</label><input id="reference-storage" name="referenceStorage" type="number" min="0.1" step="0.1" /></div>
+                    <div><label class="field-label" for="reference-storage">Armazenamento mínimo (GB)</label><input id="reference-storage" name="referenceStorage" type="number" min="0.1" step="0.1" /></div>
+                    <div><label class="field-label" for="reference-storage-kind">Tipo do mínimo de armazenamento</label><select id="reference-storage-kind" name="referenceStorageKind"><option value="freeSpace">Espaço livre disponível</option><option value="capacity">Capacidade total do disco</option></select></div>
                   </div>
                   <div class="field-grid">
                     <div><label class="field-label" for="reference-directx">DirectX mínimo, se publicado</label><input id="reference-directx" name="referenceDirectx" type="number" min="1" step="1" /></div>
